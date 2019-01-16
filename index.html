@@ -1,0 +1,189 @@
+<style>
+
+*{
+	font-size: 17;
+	font-family: monospace;
+
+}
+
+body{text-align: center;}
+
+#tabuleiro{
+	cursor: pointer; 
+	margin:auto;
+}
+
+.coluna{
+	display: block;
+	height: 70;
+	margin: 0;
+}
+
+.linha{
+	background-color: green;
+	width: 70;
+	height: 70;
+	display: flex;
+	float: left;
+	justify-content: center;
+	align-items: center;
+}
+
+
+
+.escuro{background-color: #b58863}
+.claro{background-color: #f0d9b5}
+
+/*.linha{background-color: #b58863}*/
+
+.rainha{
+	background: url(rainha.svg) center center;
+	background-size: 60%;
+	background-repeat: no-repeat;
+}
+
+.bloqueado{opacity: 1}
+
+#geral{
+	max-width: 70%;
+	width: 500;
+	margin: auto;
+	padding: 20;
+}
+
+img{width: 50}
+
+
+</style>
+
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta name="viewport" content="width=500, initial-scale=1">
+
+<div><span id="quantidade">0</span> / <span id=falta>0</span></div><br>
+
+<button id="less">-</button> <button id="plus">+</button>
+
+<br><br>
+<div id='tabuleiro'></div>
+
+<div id="geral">
+	O problema das n damas é o problema matemático de dispor n damas em um tabuleiro de xadrez de dimensão nxn, de forma que nenhuma delas seja atacada por outra. Para tanto, é necessário que duas damas quaisquer não estejam numa mesma linha, coluna, ou diagonal.
+</div>
+
+<script>
+
+	casas = 5
+
+	less.onclick=function(){ casas--; gerar() }
+	plus.onclick=function(){ casas++; gerar() }
+
+	function gerar(){
+
+		tabuleiro.innerHTML=""
+
+		guardar = []
+		tabuleiro.style.width = 70*casas
+
+		for(i=0;i<casas;i++){
+			tabuleiro.innerHTML += "<div class='coluna'></div>"
+			for(j=0;j<casas;j++){
+				tabuleiro.children[i].innerHTML += "<div class='linha'></div>"
+			}
+		}
+
+		coluna = document.querySelectorAll(".coluna")
+		linha = document.querySelectorAll(".linha")
+
+		for(i=0;i<casas;i++){
+			for(j=0;j<casas;j++){
+
+				if((i+j)%2 == 0)
+					coluna[i].children[j].classList.toggle("claro")
+				else
+					coluna[i].children[j].classList.toggle("escuro")
+
+				coluna[i].children[j].onclick=function(i,j){
+
+					if(coluna[i].children[j].innerHTML != "*"){
+						if(coluna[i].children[j].innerHTML.match(/img/g) == null){
+							troca(i,j);
+							pontuacao()
+						}
+						else{
+							destroca(i,j)
+							reseta(i,j)
+							pontuacao()
+						}
+					}
+
+				}.bind(null,i,j)
+			}
+		}
+
+		function troca(i,j){
+
+			for(a=0;a<casas;a++){
+				for(b=0;b<casas;b++){
+					tabuleiro.children[i].children[b].innerHTML="*"
+					tabuleiro.children[b].children[j].innerHTML="*"
+					if(a-i == b-j)
+						tabuleiro.children[a].children[b].innerHTML = "*"
+					if(i+j == a+b)
+						tabuleiro.children[a].children[b].innerHTML = "*"
+				}	
+			}
+			tabuleiro.children[i].children[j].innerHTML = "<img src='rainha.png'>"
+		}
+
+		function destroca(i,j){
+			for(a=0;a<casas;a++){
+				for(b=0;b<casas;b++){
+					tabuleiro.children[i].children[b].innerHTML=""
+					tabuleiro.children[b].children[j].innerHTML=""
+					if(a-i == b-j)
+						tabuleiro.children[a].children[b].innerHTML = ""
+					if(i+j == a+b)
+						tabuleiro.children[a].children[b].innerHTML = ""
+				}	
+			}
+			tabuleiro.children[i].children[j].innerHTML = ""
+		}
+
+
+		
+		function reseta(){
+			for(i=0;i<casas;i++){
+				for(j=0;j<casas;j++){
+					if(coluna[i].children[j].innerHTML.match(/img/g)){
+						troca(i,j)
+					}
+				}
+			}
+		}
+
+
+		
+		function pontuacao(){
+			qt = 0
+			for(i=0;i<casas;i++){
+				for(j=0;j<casas;j++){
+					if(coluna[i].children[j].innerHTML.match(/img/g)){
+						qt++
+					}
+				}
+			}
+			falta.innerHTML=casas
+			quantidade.innerHTML=qt
+
+		}
+		pontuacao()
+	}
+
+
+
+	gerar()
+	
+
+
+
+</script>
